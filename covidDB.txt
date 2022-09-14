@@ -1,0 +1,261 @@
+drop database covidDB;
+create database covidDB;
+
+CREATE TABLE Company (
+  CName     VARCHAR(50) NOT NULL,
+  Street    VARCHAR(50),
+  City      VARCHAR(50),
+  Province  CHAR(2),
+  PC        CHAR(6),
+  PRIMARY KEY(CName)
+);
+
+CREATE TABLE Vaccine (
+  Lot         CHAR(6)     NOT NULL,
+  CName       VARCHAR(50) NOT NULL,
+  Expiry      DATE,
+  ProducedOn  DATE,
+  Doses       INTEGER,
+  PRIMARY KEY(Lot),
+  FOREIGN KEY(CName) REFERENCES Company(CName)
+);
+
+CREATE TABLE VaxClinic (
+  VCName    VARCHAR(50) NOT NULL,
+  Street    VARCHAR(50),
+  City      VARCHAR(50),
+  Province  CHAR(2),
+  PC        CHAR(6),
+  PRIMARY KEY(VCName)
+);
+
+CREATE TABLE Patient (
+  POHIP     CHAR(10) NOT NULL,
+  FirstName VARCHAR(30),
+  LastName  VARCHAR(30),
+  BDate     DATE,
+  PRIMARY KEY(POHIP)
+);
+
+CREATE TABLE Vaccination (
+  VOHIP   CHAR(10)    NOT NULL,
+  VCName  VARCHAR(50) NOT NULL,
+  Lot     CHAR(6)     NOT NULL,
+  Date    DATE,
+  Time    TIME(0),
+  PRIMARY KEY(VOHIP, VCName, Lot, Date),
+  FOREIGN KEY(VOHIP) REFERENCES Patient(POHIP),
+  FOREIGN KEY(VCName) REFERENCES VaxClinic(VCName),
+  FOREIGN KEY(Lot) REFERENCES Vaccine(Lot)
+);
+
+CREATE TABLE Shipment (
+  Lot     CHAR(6)     NOT NULL,
+  VCName  VARCHAR(50) NOT NULL,
+  Doses   INTEGER     NOT NULL,
+  PRIMARY KEY(Lot, VCName, Doses),
+  FOREIGN KEY(Lot) REFERENCES Vaccine(Lot),
+  FOREIGN KEY(VCName) REFERENCES VaxClinic(VCName)
+);
+
+CREATE TABLE Spouse (
+  SOHIP     CHAR(10) NOT NULL,
+  POHIP     CHAR(10) NOT NULL,
+  Phone     CHAR(12),
+  FirstName VARCHAR(30),
+  LastName  VARCHAR(30),
+  PRIMARY KEY(SOHIP, POHIP),
+  FOREIGN KEY(POHIP) REFERENCES Patient(POHIP)
+);
+
+CREATE TABLE HealthcareWorker (
+  ID        CHAR(8) NOT NULL,
+  FirstName VARCHAR(30),
+  LastName  VARCHAR(30),
+  PRIMARY KEY(ID)
+);
+
+CREATE TABLE WorkerCredentials (
+  WorkerID    CHAR(8)     NOT NULL,
+  Credential  VARCHAR(30) NOT NULL,
+  PRIMARY KEY(WorkerID, Credential),
+  FOREIGN KEY(WorkerID) REFERENCES HealthcareWorker(ID)
+);
+
+CREATE TABLE Nurse (
+  NurseID  CHAR(8) NOT NULL,
+  PRIMARY KEY(NurseID),
+  FOREIGN KEY(NurseID) REFERENCES HealthcareWorker(ID)
+);
+
+CREATE TABLE Practice (
+  PName   VARCHAR(50) NOT NULL,
+  Phone   CHAR(12)    NOT NULL,
+  PRIMARY KEY(PName)
+);
+
+CREATE TABLE Doctor (
+  DocID    CHAR(8)     NOT NULL,
+  PracName VARCHAR(50) NOT NULL,
+  PRIMARY KEY(DocID),
+  FOREIGN KEY(DocID) REFERENCES HealthcareWorker(ID),
+  FOREIGN KEY(PracName) REFERENCES Practice(PName)
+);
+
+CREATE TABLE NurseAssignment (
+  ID      CHAR(8) NOT NULL,
+  VCName  VARCHAR(50) NOT NULL,
+  PRIMARY KEY(ID, VCName),
+  FOREIGN KEY(ID) REFERENCES Nurse(NurseID),
+  FOREIGN KEY(VCName) REFERENCES VaxClinic(VCName)
+);
+
+CREATE TABLE DocAssignment (
+  ID      CHAR(8) NOT NULL,
+  VCName  VARCHAR(50) NOT NULL,
+  PRIMARY KEY(ID, VCName),
+  FOREIGN KEY(ID) REFERENCES Doctor(DocID),
+  FOREIGN KEY(VCName) REFERENCES VaxClinic(VCName)
+);
+
+INSERT INTO Company VALUES
+  ('Pfizer', '2292 Whitmore Road', 'Woodbridge', 'ON', 'L0L0L0'),
+  ('Moderna', '4587 Boulevard Laflèche', 'Riviere Du Loup', 'QC', 'G5R3E9'),
+  ('Astrazeneca', '2646 Carling Avenue', 'Ottawa', 'ON', 'K1Z7B5'),
+  ('Johnson & Johnson', '3587 47th Avenue', 'Watson Lake', 'YT', 'Y0A1C0')
+;
+
+INSERT INTO Vaccine VALUES
+  ('EY0578', 'Astrazeneca', '2025-06-21', '2021-04-05', 25434),
+  ('MT0062', 'Pfizer', '2025-05-02', '2021-05-21', 36154),
+  ('KY0245', 'Moderna', '2025-07-25', '2021-07-05', 12123),
+  ('KG5254', 'Pfizer', '2025-01-03', '2021-11-15', 50127),
+  ('LW2345', 'Astrazeneca', '2025-04-27', '2021-12-12', 26326),
+  ('PS1241', 'Johnson & Johnson', '2025-11-12', '2021-12-01', 47852)
+;
+
+INSERT INTO Patient VALUES
+  ('1532649845', 'Chanel', 'Wu', '1995-06-21'),
+  ('6519871234', 'Elisa', 'Case', '1997-12-20'),
+  ('9516546843', 'Rowan', 'Petty', '1999-04-11'),
+  ('9518416516', 'Franklin', 'Rios', '1995-09-05'),
+  ('7894561231', 'Luca', 'Mullins', '1980-04-15'),
+  ('8166546546', 'Kierra', 'Turner', '1986-05-09')
+;
+
+INSERT INTO Spouse VALUES
+  ('6541657894', '9518416516', '226-271-2259', 'June', 'Solis'),
+  ('1233211561', '6519871234', '216-762-4593', 'Edgar', 'Frye'),
+  ('9844563215', '7894561231', '215-903-5065', 'Bailey', 'Holland'),
+  ('9819819811', '1532649845', '226-393-2948', 'Anna', 'Kerr')
+;
+
+INSERT INTO VaxClinic VALUES
+  ('Eastside Integrated Primary Care', '4069 St. Paul Street', 'Niagara Falls', 'ON', 'L2E4E6'),
+  ('Discovery Health MD', '3609 Burdett Avenue', 'Victoria', 'BC', 'V8Z2J8'),
+  ('Jogan Health', '3973 Brand Road', 'Saskatoon', 'SK', 'S7K1W8'),
+  ('Ash Way Park and Ride', '4694 Shaughnessy St', 'Port Coquitlam', 'BC', 'V3C4S7'),
+  ('Aristo Mobile', '1904 Ross Street', 'Kingston', 'ON', 'K7L4V4'),
+  ('Birds Eye Medical', '1579 5th Avenue', 'Woking', 'AB', 'T0H3V0')
+;
+
+INSERT INTO Shipment VALUES
+  ('EY0578', 'Jogan Health', 2305),
+  ('KY0245', 'Jogan Health', 3215),
+  ('KY0245', 'Jogan Health', 6514),
+  ('KY0245', 'Discovery Health MD', 1234),
+  ('PS1241', 'Discovery Health MD', 2136),
+  ('LW2345', 'Jogan Health', 4123),
+  ('MT0062', 'Jogan Health', 4201),
+  ('EY0578', 'Discovery Health MD', 1201),
+  ('LW2345', 'Aristo Mobile', 2102),
+  ('KY0245', 'Aristo Mobile', 3215),
+  ('PS1241', 'Aristo Mobile', 5123),
+  ('MT0062', 'Birds Eye Medical', 2142),
+  ('MT0062', 'Birds Eye Medical', 6215),
+  ('PS1241', 'Birds Eye Medical', 6546),
+  ('PS1241', 'Ash Way Park and Ride', 4125)
+;
+
+INSERT INTO Vaccination VALUES
+  ('1532649845', 'Discovery Health MD', 'EY0578', '2022-11-15', '12:54:14'),
+  ('9516546843', 'Discovery Health MD', 'EY0578', '2022-10-17', '12:32:15'),
+  ('6519871234', 'Jogan Health', 'MT0062', '2022-05-06', '14:32:54'),
+  ('9518416516', 'Aristo Mobile', 'LW2345', '2022-07-09', '16:23:42'),
+  ('7894561231', 'Birds Eye Medical', 'PS1241', '2022-03-01', '08:02:41'),
+  ('9516546843', 'Birds Eye Medical', 'PS1241', '2022-12-09', '10:02:41'),
+  ('9516546843', 'Birds Eye Medical', 'MT0062', '2022-04-03', '12:05:41'),
+  ('9516546843', 'Birds Eye Medical', 'MT0062', '2022-06-07', '14:02:30'),
+  ('8166546546', 'Ash Way Park and Ride', 'PS1241', '2022-09-11', '13:41:34')
+;
+
+INSERT INTO HealthcareWorker VALUES
+  ('65415648', 'Amari', 'Bush'),
+  ('98445684', 'Blaze', 'Hamilton'),
+  ('84632156', 'Brogan', 'Kemp'),
+  ('32165151', 'Kailee', 'Barker'),
+  ('21365165', 'Dereon', 'Singh'),
+  ('42365115', 'Rolando', 'Sparks'),
+  ('35465498', 'Vivian', 'Cabrera'),
+  ('78948965', 'John', 'Collier'),
+  ('54612365', 'Chace', 'Cochran'),
+  ('61365494', 'Jakob', 'Duncan')
+;
+
+INSERT INTO WorkerCredentials VALUES
+  ('65415648', 'NP'),
+  ('98445684', 'PhD'),
+  ('84632156', 'NP'),
+  ('32165151', 'PhD'),
+  ('21365165', 'RN'),
+  ('42365115', 'RN'),
+  ('35465498', 'NP'),
+  ('78948965', 'PhD'),
+  ('54612365', 'PhD'),
+  ('61365494', 'RN')
+;
+
+INSERT INTO Nurse VALUES
+  ('65415648'),
+  ('84632156'),
+  ('21365165'),
+  ('42365115'),
+  ('35465498'),
+  ('61365494')
+;
+
+INSERT INTO Practice VALUES
+  ('Grandview Behavioral Health', '519-302-3674'),
+  ('Doctors Medcare Of Gasden', '226-247-8711'),
+  ('Canterberry Family Practice', '250-624-2523'),
+  ('Akins Medical', '204-715-3139')
+;
+
+INSERT INTO Doctor VALUES
+  ('98445684', 'Grandview Behavioral Health'),
+  ('32165151', 'Doctors Medcare Of Gasden'),
+  ('78948965', 'Canterberry Family Practice'),
+  ('54612365', 'Akins Medical')
+;
+
+INSERT INTO DocAssignment VALUES
+  ('98445684', 'Eastside Integrated Primary Care'),
+  ('32165151', 'Jogan Health'),
+  ('98445684', 'Jogan Health'),
+  ('78948965', 'Ash Way Park and Ride'),
+  ('78948965', 'Birds Eye Medical'),
+  ('54612365', 'Discovery Health MD'),
+  ('54612365', 'Ash Way Park and Ride')
+;
+
+INSERT INTO NurseAssignment VALUES
+  ('65415648', 'Eastside Integrated Primary Care'),
+  ('84632156', 'Birds Eye Medical'),
+  ('65415648', 'Birds Eye Medical'),
+  ('35465498', 'Birds Eye Medical'),
+  ('21365165', 'Aristo Mobile'),
+  ('42365115', 'Discovery Health MD'),
+  ('35465498', 'Discovery Health MD'),
+  ('65415648', 'Discovery Health MD'),
+  ('61365494', 'Ash Way Park and Ride')
+;

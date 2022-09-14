@@ -1,0 +1,76 @@
+html * {
+    font-family: sans-serif;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin: 20px 30px;
+}
+
+h2 {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    align-items: left;
+    width: 100%;
+}
+
+select {
+    padding: 12px 20px;
+    margin: 0;
+    width: 50%;
+}
+
+select option {
+    width: 50%;
+}
+
+input[type=text] {
+    padding: 12px 20px;
+    margin: 0;
+    width: 44%;
+}
+
+input[type=submit] {
+    background-color: #008CFF;
+    padding: 16px 32px;
+    margin: 4px 2px;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    width: 20%;
+}
+
+label {
+    padding:0px 0px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 5px 0px;
+}
+  
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+  
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
